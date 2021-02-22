@@ -5,14 +5,18 @@ let leftImageElement = document.getElementById('leftImage');
 let middleImageElement = document.getElementById('midleImage');
 let rightImageElement = document.getElementById('rightImage');
 let containerEl = document.getElementById('container');
-let button= document.getElementById('result');
 let arrOfObjects = [];
+let namesArr = [];
+let arrOfVotes = [];
+let imagesCountArr = [];
+let pre=[];
 function Product(name, source){
   this.name = name;
   this.source = source;
   this.votes = 0;
   this.showen=0;
   arrOfObjects.push(this);
+  namesArr.push(this.name);
 }
 new Product('bag','img/bag.jpg');
 new Product('banana','img/banana.jpg');
@@ -41,12 +45,13 @@ function renderThreeRandomImages(){
   leftImageIndex = generateRandomIndex();
   middleImageIndex =generateRandomIndex();
   rightImageIndex = generateRandomIndex();
-  while((leftImageIndex === rightImageIndex)||(leftImageIndex=== middleImageIndex)||(rightImageIndex === middleImageIndex))
+  while(leftImageIndex === rightImageIndex||leftImageIndex=== middleImageIndex||rightImageIndex === middleImageIndex||pre.includes(leftImageIndex)||pre.includes(middleImageIndex)||pre.includes(rightImageIndex))
   {
     leftImageIndex = generateRandomIndex();
     middleImageIndex= generateRandomIndex();
     rightImageIndex=generateRandomIndex();
   }
+  pre[0]=leftImageIndex;pre[1]=middleImageIndex;pre[2]=rightImageIndex;
   arrOfObjects[leftImageIndex].showen ++;
   arrOfObjects[middleImageIndex].showen ++;
   arrOfObjects[rightImageIndex].showen ++;
@@ -73,18 +78,39 @@ function handleClicking(event){
   }
   else{
     containerEl.removeEventListener('click', handleClicking);
-    button.addEventListener('click',resultFun);
+    for(let j = 0 ; j <arrOfObjects.length; j++){
+      arrOfVotes.push(arrOfObjects[j].votes);
+      imagesCountArr.push(arrOfObjects[j].showen);
+    }
+    chartRender();
   }
 }
 containerEl.addEventListener('click', handleClicking);
-function resultFun()
-{
-  let unorderdList = document.getElementById('unList');
-  let li;
-  for(let i = 0 ; i < arrOfObjects.length; i++){
-    li = document.createElement('li');
-    unorderdList.appendChild(li);
-    li.textContent = `${arrOfObjects[i].name} it has ${arrOfObjects[i].votes} Votes. and also it had been showen  ${arrOfObjects[i].showen} times.`
-  }
-  button.removeEventListener('click', resultFun);
+function chartRender(){
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'bar',
+
+    // The data for our dataset
+    data: {
+      labels: namesArr,
+      datasets: [{
+        label: 'Goat Votes',
+        backgroundColor: '#e36bae',
+        borderColor: 'rgb(255, 99, 132)',
+        data: arrOfVotes,
+      },{
+        label: 'Goats Displayed',
+        backgroundColor: '#f1d1d0',
+        borderColor:'rgb(155,100,30)',
+        data:imagesCountArr,
+
+      }]
+    },
+
+    // Configuration options go here
+    options: {}
+  });
 }
+
