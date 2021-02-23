@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 'use strict';
 let maximumClicks = 25;
 let attempts = 0;
@@ -5,18 +6,16 @@ let leftImageElement = document.getElementById('leftImage');
 let middleImageElement = document.getElementById('midleImage');
 let rightImageElement = document.getElementById('rightImage');
 let containerEl = document.getElementById('container');
+let button= document.getElementById('result');
 let arrOfObjects = [];
-let namesArr = [];
-let arrOfVotes = [];
-let imagesCountArr = [];
 let pre=[];
+let list=[];
 function Product(name, source){
   this.name = name;
   this.source = source;
   this.votes = 0;
   this.showen=0;
   arrOfObjects.push(this);
-  namesArr.push(this.name);
 }
 new Product('bag','img/bag.jpg');
 new Product('banana','img/banana.jpg');
@@ -59,7 +58,6 @@ function renderThreeRandomImages(){
   middleImageElement.setAttribute('src',arrOfObjects[middleImageIndex].source);
   rightImageElement.setAttribute('src', arrOfObjects[rightImageIndex].source);
 }
-renderThreeRandomImages();
 function generateRandomIndex(){
   let randomIndex = Math.floor(Math.random() * arrOfObjects.length);
   return randomIndex;
@@ -78,39 +76,37 @@ function handleClicking(event){
   }
   else{
     containerEl.removeEventListener('click', handleClicking);
-    for(let j = 0 ; j <arrOfObjects.length; j++){
-      arrOfVotes.push(arrOfObjects[j].votes);
-      imagesCountArr.push(arrOfObjects[j].showen);
-    }
-    chartRender();
+    saveProducts();
   }
 }
-containerEl.addEventListener('click', handleClicking);
-function chartRender(){
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var chart = new Chart(ctx, {
-    // The type of chart we want to create
-    type: 'bar',
-
-    // The data for our dataset
-    data: {
-      labels: namesArr,
-      datasets: [{
-        label: 'Goat Votes',
-        backgroundColor: '#e36bae',
-        borderColor: 'rgb(255, 99, 132)',
-        data: arrOfVotes,
-      },{
-        label: 'Goats Displayed',
-        backgroundColor: '#f1d1d0',
-        borderColor:'rgb(155,100,30)',
-        data:imagesCountArr,
-
-      }]
-    },
-
-    // Configuration options go here
-    options: {}
-  });
+function resultFun()
+{
+  getProducts();
+  if(list){
+  let unorderdList = document.getElementById('unList');
+  unorderdList.innerHTML='';
+  let li;
+  for(let i = 0 ; i < list.length; i++){
+    li = document.createElement('li');
+    unorderdList.appendChild(li);
+  li.textContent = `${list[i].name} it has ${list[i].votes} Votes.and also it had been showen  ${list[i].showen} times.`;
+  }
+  }
 }
+
+function saveProducts(){
+  localStorage.clear();
+  let products = JSON.stringify(arrOfObjects);
+  localStorage.setItem('AllProducts', products);
+}
+function getProducts(){
+  let gettingProducts = localStorage.getItem('AllProducts');
+  list = JSON.parse(gettingProducts);
+  }
+
+renderThreeRandomImages();
+containerEl.addEventListener('click', handleClicking);
+button.addEventListener('click',resultFun);
+
+
 
